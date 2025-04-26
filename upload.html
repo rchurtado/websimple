@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir archivo a OCI</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: "Segoe UI", sans-serif;
+    }
+    .oci-header {
+      background-color: #2e2e2e;
+      color: white;
+      padding: 15px 20px;
+      font-weight: 500;
+    }
+    .oci-section {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+    }
+    .oci-btn {
+      background-color: #2e2e2e;
+      border: none;
+    }
+    .oci-btn:hover {
+      background-color: #1c1c1c;
+    }
+    .oci-logo {
+      font-weight: 600;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="oci-header d-flex justify-content-between align-items-center">
+    <div class="oci-logo">☁ Oracle Cloud</div>
+    <div>Upload to Bucket</div>
+  </div>
+
+  <div class="oci-section">
+    <h4 class="mb-4">Subir archivo a Object Storage</h4>
+    
+    <div class="mb-3">
+      <label for="fileInput" class="form-label">Selecciona un archivo</label>
+      <input class="form-control" type="file" id="fileInput">
+    </div>
+
+    <button class="btn oci-btn text-white" onclick="uploadFile()">Subir Archivo</button>
+
+    <div class="mt-3">
+      <p id="status" class="text-muted"></p>
+    </div>
+  </div>
+
+  <script>
+    async function uploadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const status = document.getElementById('status');
+
+      if (!fileInput.files.length) {
+        status.innerText = "Por favor selecciona un archivo.";
+        return;
+      }
+
+      const file = fileInput.files[0];
+
+      // Tu Pre-Authenticated Request base URL (sin /archivo al final)
+      const baseUrl = "https://idi1o0a010nx.objectstorage.sa-santiago-1.oci.customer-oci.com/p/LMUgg8VWyrR2ExDQeqFCCOtpXOpnU0JQU9f62LrniYHWNF2ykZ9EQPib8wIN0bUa/n/idi1o0a010nx/b/shared_bucket/o";
+
+      const uploadUrl = `${baseUrl}/${encodeURIComponent(file.name)}`;
+
+      try {
+        const response = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: file,
+        });
+
+        if (response.ok) {
+          status.innerHTML = `<span class="text-success">✅ Archivo subido: <strong>${file.name}</strong></span>`;
+        } else {
+          status.innerHTML = `<span class="text-danger">❌ Error: ${response.statusText}</span>`;
+        }
+      } catch (err) {
+        console.error(err);
+        status.innerHTML = `<span class="text-danger">❌ Fallo inesperado al subir el archivo.</span>`;
+      }
+    }
+  </script>
+
+</body>
+</html>
